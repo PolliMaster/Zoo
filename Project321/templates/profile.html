@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background-color: #FFE3D8;
+            color: #262626;
+        }
+        .profile-container {
+            max-width: 935px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 44px;
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-right: 100px;
+            border: 1px solid #dbdbdb;
+            object-fit: cover;
+            box-shadow: 0 17px 16px rgba(0, 0, 0, 0.1);
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .username {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        .stats span {
+            font-weight: 600;
+        }
+        .form-section {
+            background: rgba(227, 182, 177, 0.2);
+            padding: 20px;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            border-radius: 25px; 
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .avatar-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .avatar-gallery img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .avatar-gallery img:hover {
+            opacity: 0.8;
+        }
+        input, button {
+            width: 100%;
+            padding: 7px 9px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #ff7f50;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">{% include 'header.html' %}</div>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <img src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar) }}" 
+                 alt="Аватар" class="avatar">
+            <div class="profile-info">
+                <div class="username">{{ current_user.full_name }}</div>
+                <div class="stats">
+                    <span>{{ current_user.email }}</span>
+                    <span>{{ current_user.phone }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Редактировать профиль</h3>
+            <form method="POST">
+                <input type="text" name="full_name" value="{{ current_user.full_name }}" 
+                       placeholder="Имя и фамилия" required>
+                <input type="tel" name="phone" value="{{ current_user.phone }}" 
+                       placeholder="Телефон" required>
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h3>Изменить фото профиля</h3>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="avatar" accept="image/*" required>
+                <button type="submit">Загрузить фото</button>
+            </form>
+
+            <div class="avatar-gallery">
+                {% for avatar in avatars %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + avatar) }}" 
+                         alt="{{ avatar }}"
+                         onclick="selectAvatar('{{ avatar }}')">
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div id="footer">{% include 'footer.html' %}</div>
+
+    <script>
+        function selectAvatar(filename) {
+            fetch('/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'avatar=' + encodeURIComponent(filename)
+            }).then(() => location.reload());
+        }
+    </script>
+</body>
+</html>

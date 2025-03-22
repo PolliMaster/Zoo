@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-запись</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='gallery.css') }}">
+</head>
+
+<body>
+    <div id="header">{% include 'header.html' %}</div>
+
+    <main>
+        <section class="welcome center">
+            <h2 class='center'>Добро пожаловать в наш зоомагазин!</h2>
+            <div class="gallery">
+              <div class="clipped-border">
+                <img src="{{ url_for('static', filename='images/24.jpg') }}" id="clipped">
+              </div>
+              <div class="clipped-border">
+                <img src="{{ url_for('static', filename='images/24.jpg') }}" id="clipped">
+              </div>
+              <div class="clipped-border">
+                <img src="{{ url_for('static', filename='images/24.jpg') }}" id="clipped">
+              </div>
+              <div class="clipped-border">
+                <img src="{{ url_for('static', filename='images/24.jpg') }}" id="clipped">
+              </div>
+              <div class="clipped-border">
+                <img src="{{ url_for('static', filename='images/24.jpg') }}" id="clipped">
+              </div>
+              <div class="shadow"></div>
+            </div>
+            <p>Наш зоомагазин предлагает все для ваших любимцев: от питания до аксессуаров и услуг.</p>
+        </section>

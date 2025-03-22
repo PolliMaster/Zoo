@@ -1,0 +1,34 @@
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Связь с нами</h4>
+            <p>Адрес: Улица Зоомагазинов, д. 1</p>
+            <p>Телефон: +7 (123) 456-78-90</p>
+            <p>Email: info@zooshop.com</p>
+        </div>
+        <div class="footer-section">
+            <h4>Быстрые ссылки</h4>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Главная</a></li>
+                <li><a href="{{ url_for('rooms') }}">Номера</a></li>
+                <li><a href="{{ url_for('info') }}">Информация</a></li>
+                <li><a href="{{ url_for('grooming') }}">Груминг</a></li>
+                <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+                <li><a href="{{ url_for('appointment') }}">Онлайн-запись</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4><img style="width:30px; box-shadow:0 0px 0px rgba(0, 0, 0, 0.1);"src="{{ url_for('static', filename='images/Lapka.png') }}" alt='Лапка'> Социальные сети</h4>
+            <ul class="social-icons">
+                <li><a href="#" target="_blank"><img src="{{ url_for('static', filename='images/Facebook.png') }}" alt="Facebook"></a></li>
+                <li><a href="#" target="_blank"><img src="{{ url_for('static', filename='images/X.png') }}" alt="X"></a></li>
+                <li><a href="#" target="_blank"><img src="{{ url_for('static', filename='images/Instagram.png') }}" alt="Instagram"></a></li>
+                <li><a href="#" target="_blank"><img src="{{ url_for('static', filename='images/YouTube.png') }}" alt="YouTube"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2025 Уход за животными. Все права защищены.</p>
+        <p>Политика конфиденциальности | Условия использования</p>
+    </div>
+</footer>

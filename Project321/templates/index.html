@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div id="header">{% include 'header.html' %}</div>
+
+    <main>
+        <section class="welcome center">
+            <h2 class='center'>Добро пожаловать в наш зоомагазин!</h2> 
+            <div class='welcome_div' style="display:flex;flex-wrap: nowrap; text-align:left;">
+                <img class="img_welcome" src="{{ url_for('static', filename='images/Cats.png') }}" alt="Добро пожаловать">
+                <h3>В нашем зоомагазине вы найдете все, что нужно для ухода за вашими питомцами. Мы предлагаем широкий ассортимент кормов, игрушек, аксессуаров и услуг, чтобы ваши любимцы всегда были счастливы и здоровы.</h3>
+            </div>
+        </section>
+
+        <section class="featured-products center">
+            <h2 class='center'>Популярные товары</h2>
+            <div class="product-grid">
+                <div class="product">
+                    <img src="{{ url_for('static', filename='/images/index 4/кормдлясобак.webp') }}" alt="Сухой корм для собак">
+                    <h3>Сухой корм для собак</h3>
+                    <p>Отличное питание для здоровья вашего питомца.</p>
+                    <button><a class="a-cart" href="/appointment">Добавить в корзину</a></button>
+                </div>
+                <div class="product">
+                    <img src="{{ url_for('static', filename='/images/index 4/игрушка.webp') }}" height="703" width="807" alt="Игрушка для кошек">
+                    <h3>Игрушка для кошек</h3>
+                    <p>Развлечение и активность для вашего кота.</p>
+                    <button><a class="a-cart" href="/appointment">Добавить в корзину</a></button>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter center">
+            <h2 class='center'>Подпишитесь на нашу рассылку</h2>
+            <form action="{{ url_for('subscribe') }}" method="POST">
+                <input type="email" name="email" placeholder="Ваш email" required>
+                <button type="submit">Подписаться</button>
+            </form>
+        </section>
+
+        <section class="services center">
+            <h2 class='center'>Наши услуги</h2>
+            <div class="service-grid">
+                <div class="service">
+                    <img src="{{ url_for('static', filename='/images/index 4/груминг.jpg') }}" alt="Груминг">
+                    <h3>Груминг</h3>
+                    <a href="{{ url_for('grooming') }}">Узнать больше</a>
+                </div>
+                <div class="service">
+                    <img src="{{ url_for('static', filename='/images/index 4/проживание.jpg') }}" alt="Проживание">
+                    <h3>Проживание</h3>
+                    <a href="{{ url_for('rooms') }}">Узнать больше</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonials center">
+            <h2 class='center'>Отзывы наших клиентов</h2>
+            <blockquote>
+                <p>Наша собака всегда в восторге от посещения зоомагазина! Отличные товары и услуги!</p>
+                <footer>— Счастливый владелец</footer>
+            </blockquote>
+        </section>
+    </main>
+
+    <div id="footer">{% include 'footer.html' %}</div>
+
+</body>
+
+</html>
