@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь мероприятий - Благотворительность</title>
+    <!-- Bootstrap 3 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Уникальные стили для календаря и модального окна */
+        .custom-calendar-title {
+            color: #845162;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .custom-charity-banner {
+            background-color: rgba(82, 44, 93, 0.1);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-charity-banner h2 {
+            color: #845162;
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .custom-charity-banner p {
+            margin: 5px 0;
+            font-size: 1em;
+        }
+
+        .custom-donate-button {
+            background-color: #522C5D;
+            color: #FFE3D8;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .custom-donate-button:hover {
+            background-color: #845162;
+        }
+
+        .custom-calendar-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-calendar {
+            background-color: rgba(227, 182, 177, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .custom-calendar h3 {
+            color: #845162;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .custom-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            text-align: center;
+        }
+
+        .custom-day-header {
+            background-color: #E3B6B1;
+            color: #150016;
+            padding: 8px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .custom-day {
+            background-color: #FFF;
+            padding: 10px;
+            border-radius: 3px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            border: 1px solid #522C5D;
+        }
+
+        .custom-action-day {
+            background-color: rgba(41, 16, 74, 0.1);
+            font-weight: bold;
+            color: #29104A;
+            border-color: #845162;
+        }
+
+        .custom-action-day p {
+            margin: 0;
+            font-size: 0.8em;
+        }
+
+        .custom-today {
+            border: 2px solid #845162; /* Подсветка сегодняшней даты бордером */
+            background-color: rgba(132, 81, 98, 0.1); /* Легкий акцентный фон */
+            font-weight: bold;
+        }
+
+        /* Модальное окно с уникальными классами */
+        .custom-modal {
+            background: transparent;
+            padding: 0;
+            width: auto;
+            text-align: left;
+        }
+
+        .modal-dialog {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .custom-modal-content {
+            border-radius: 10px;
+            background-color: rgba(227, 182, 177, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-modal-header {
+            background-color: #522C5D;
+            color: #FFE3D8;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding: 15px;
+            border-bottom: none;
+        }
+
+        .custom-modal-title {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .custom-modal-body {
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .custom-donate-form {
+            background-color: transparent;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .custom-modal-body .custom-form-group {
+            margin-bottom: 15px;
+        }
+
+        .custom-modal-body .custom-form-control {
+            background-color: #FFF;
+            border: 1px solid #522C5D;
+            border-radius: 4px;
+            color: #29104A;
+            padding: 10px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .custom-modal-body .custom-form-control:focus {
+            border-color: #845162;
+            outline: none;
+            box-shadow: 0 0 5px rgba(132, 81, 98, 0.3);
+        }
+
+        .custom-modal-body .custom-form-control::placeholder {
+            color: #29104A;
+            opacity: 0.5;
+        }
+
+        .custom-modal-body .custom-label {
+            color: #29104A;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .custom-modal-footer {
+            background-color: rgba(227, 182, 177, 0.2);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            padding: 15px;
+            border-top: none;
+            text-align: right;
+            background-color: #fff;
+        }
+
+        .custom-modal-footer .custom-btn-primary {
+            background-color: #522C5D;
+            border-color: #522C5D;
+            color: #FFE3D8;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 0;
+        }
+
+        .custom-modal-footer .custom-btn-primary:hover {
+            background-color: #845162;
+            border-color: #845162;
+        }
+
+        .custom-modal-footer .custom-btn-default {
+            background-color: #E3B6B1;
+            border-color: #E3B6B1;
+            color: #150016;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 0 10px 0 0;
+        }
+
+        .custom-modal-footer .custom-btn-default:hover {
+            background-color: #D39A94;
+            border-color: #D39A94;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">{% include 'header.html' %}</div>
+
+    <main>
+        <h2 class="custom-calendar-title">Календарь мероприятий</h2>
+        <section class="custom-charity-banner">
+            <h2>Помогите животным вместе с нами!</h2>
+            <p>Поддержите наш фонд — каждая покупка корма в дни акций спасает жизни.</p>
+            <button class="custom-donate-button" data-toggle="modal" data-target="#customDonateModal">Пожертвовать</button>
+        </section>
+        <div class="custom-calendar-container">
+            <section class="custom-calendar">
+                <h3></h3>
+                <div class="custom-calendar-grid" id="customCalendarGrid">
+                    <div class="custom-day-header">Пн</div>
+                    <div class="custom-day-header">Вт</div>
+                    <div class="custom-day-header">Ср</div>
+                    <div class="custom-day-header">Чт</div>
+                    <div class="custom-day-header">Пт</div>
+                    <div class="custom-day-header">Сб</div>
+                    <div class="custom-day-header">Вс</div>
+                    <div class="custom-day"></div>
+                    <div class="custom-day"></div>
+                    <div class="custom-day"></div>
+                    <div class="custom-day"></div>
+                    <div class="custom-day"></div>
+                    <div class="custom-day">1</div>
+                    <div class="custom-day">2</div>
+                    <div class="custom-action-day">3<p>Купи 2 корма — 3 в фонд</p></div>
+                    <div class="custom-day">4</div>
+                    <div class="custom-day">5</div>
+                    <div class="custom-day">6</div>
+                    <div class="custom-day">7</div>
+                    <div class="custom-day">8</div>
+                    <div class="custom-day">9</div>
+                    <div class="custom-action-day">10<p>Купи 2 корма — 3 в фонд</p></div>
+                    <div class="custom-day">11</div>
+                    <div class="custom-day">12</div>
+                    <div class="custom-day">13</div>
+                    <div class="custom-day">14</div>
+                    <div class="custom-day custom-today">15</div> <!-- Сегодняшняя дата -->
+                    <div class="custom-day">16</div>
+                    <div class="custom-action-day">17<p>Купи 2 корма — 3 в фонд</p></div>
+                    <div class="custom-day">18</div>
+                    <div class="custom-day">19</div>
+                    <div class="custom-day">20</div>
+                    <div class="custom-day">21</div>
+                    <div class="custom-day">22</div>
+                    <div class="custom-day">23</div>
+                    <div class="custom-action-day">24<p>Купи 2 корма — 3 в фонд</p></div>
+                    <div class="custom-day">25</div>
+                    <div class="custom-day">26</div>
+                    <div class="custom-day">27</div>
+                    <div class="custom-day">28</div>
+                    <div class="custom-day">29</div>
+                    <div class="custom-day">30</div>
+                    <div class="custom-action-day">31<p>Купи 2 корма — 3 в фонд</p></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Модальное окно с уникальным ID -->
+        <div class="modal fade custom-modal" id="customDonateModal" tabindex="-1" role="dialog" aria-labelledby="customDonateModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="custom-modal-content">
+                    <div class="custom-modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="custom-modal-title" id="customDonateModalLabel">Пожертвование</h4>
+                    </div>
+                    <div class="custom-modal-body">
+                        <form id="customDonateForm" class="custom-donate-form">
+                            <div class="custom-form-group">
+                                <label for="customCardNumber" class="custom-label">Номер карты</label>
+                                <input type="text" class="custom-form-control" id="customCardNumber" placeholder="Введите 16 цифр" maxlength="16" required>
+                            </div>
+                            <div class="custom-form-group">
+                                <label for="customCardHolder" class="custom-label">Имя владельца</label>
+                                <input type="text" class="custom-form-control" id="customCardHolder" placeholder="Введите имя" required>
+                            </div>
+                            <div class="custom-form-group">
+                                <label for="customCvv" class="custom-label">CVV</label>
+                                <input type="text" class="custom-form-control" id="customCvv" placeholder="Введите 3 цифры" maxlength="3" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="custom-modal-footer">
+                        <button type="button" class="custom-btn-default" data-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="custom-btn-primary" form="customDonateForm">Отправить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer">{% include 'footer.html' %}</div>
+
+    <!-- Bootstrap JS и jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        // Строгая валидация ввода
+        document.getElementById('customCardNumber').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 16) this.value = this.value.slice(0, 16);
+        });
+
+        document.getElementById('customCardHolder').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+        });
+
+        document.getElementById('customCvv').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 3) this.value = this.value.slice(0, 3);
+        });
+
+        // Проверка при отправке формы
+        document.getElementById('customDonateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (document.getElementById('customCardNumber').value.length !== 16) {
+                alert('Номер карты должен содержать ровно 16 цифр!');
+                return;
+            }
+            if (!document.getElementById('customCardHolder').value) {
+                alert('Введите имя владельца карты!');
+                return;
+            }
+            if (document.getElementById('customCvv').value.length !== 3) {
+                alert('CVV должен содержать ровно 3 цифры!');
+                return;
+            }
+            alert('Форма отправлена успешно! (Это демо)');
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Функция для генерации календаря
+            function generateCalendar() {
+                const today = new Date(); // Текущая дата
+                const todayDay = today.getDate(); // День месяца
+                const todayMonth = today.getMonth(); // Месяц (0-11)
+                const todayYear = today.getFullYear(); // Год
+
+                // Массив названий месяцев на русском
+                const months = [
+                    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+                ];
+
+                // Обновляем заголовок календаря
+                const calendarTitle = document.querySelector('.custom-calendar h3');
+                calendarTitle.textContent = `${months[todayMonth]} ${todayYear}`;
+
+                // Получаем первый день месяца и количество дней в месяце
+                const firstDayOfMonth = new Date(todayYear, todayMonth, 1);
+                const daysInMonth = new Date(todayYear, todayMonth + 1, 0).getDate();
+                const firstDayWeekday = firstDayOfMonth.getDay() || 7; // Преобразуем Sunday (0) в 7
+
+                // Дни акций (можно настроить)
+                const actionDays = [3, 10, 17, 24, 31]; // Пример дней акций
+
+                // Очищаем текущую сетку календаря
+                const calendarGrid = document.getElementById('customCalendarGrid');
+                while (calendarGrid.children.length > 7) { // Оставляем только заголовки дней недели
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
+
+                // Добавляем пустые ячейки до первого дня месяца
+                for (let i = 1; i < firstDayWeekday; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'custom-day';
+                    calendarGrid.appendChild(emptyDay);
+                }
+
+                // Заполняем календарь днями месяца
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'custom-day';
+
+                    // Проверяем, является ли день акционным
+                    if (actionDays.includes(day)) {
+                        dayElement.className += ' custom-action-day';
+                        dayElement.innerHTML = `${day}<p>Купи 2 корма — 3 в фонд</p>`;
+                    } else {
+                        dayElement.textContent = day;
+                    }
+
+                    // Подсвечиваем сегодняшнюю дату
+                    if (day === todayDay) {
+                        dayElement.className += ' custom-today';
+                    }
+
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+
+            // Генерируем календарь при загрузке страницы
+            generateCalendar();
+        });
+
+        // Исправление позиционирования модального окна
+        $(document).ready(function() {
+            $('#customDonateModal').on('shown.bs.modal', function () {
+                var modal = $(this);
+                var modalDialog = modal.find('.modal-dialog');
+                var windowHeight = $(window).height();
+                var modalHeight = modalDialog.height();
+                var topPosition = (windowHeight - modalHeight) / 2;
+
+                if (topPosition < 30) {
+                    topPosition = 30; // Минимальный отступ сверху
+                }
+
+                modalDialog.css({
+                    'margin-top': topPosition + 'px',
+                    'margin-bottom': '30px'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

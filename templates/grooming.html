@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Груминг</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .services-list {
+            text-align: center;
+            padding: 40px;
+        }
+        .services {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .service {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            width: 250px;
+            text-align: center;
+        }
+        .service img {
+            width: 150px; /* Устанавливаем одинаковую ширину для всех изображений */
+            height: 150px; /* Устанавливаем одинаковую высоту для всех изображений */
+            object-fit: cover; /* Чтобы изображения не искажались, но были обрезаны по размеру */
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-modal-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .gallery-modal img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        .prev, .next {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Стили для горизонтальной галереи */
+        .image-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap; /* Чтобы изображения не выходили за пределы экрана */
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            width: 150px; /* Устанавливаем одинаковую ширину */
+            height: 150px; /* Устанавливаем одинаковую высоту */
+            object-fit: cover; /* Чтобы изображения не искажались, но были обрезаны по размеру */
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+        }
+        .modal .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: #000;
+            cursor: pointer;
+        }
+        .modal h3 {
+            margin-bottom: 20px;
+        }
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal button {
+            padding: 10px 20px;
+            background: #e362d9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">{% include 'header.html' %}</div>
+
+    <main>
+        <section class="services-list">
+            <h2>Услуги груминга</h2>
+            <div class="services">
+                <div class="service">
+                    <img src="{{ url_for('static', filename='images/trimming.jpg') }}" alt="Стрижка" class="open-gallery">
+                    <h3>Стрижка</h3>
+                    <p>Цена: 500 руб.</p>
+                    <button class="open-modal" data-service="Стрижка">Записаться</button>
+                </div>
+                <div class="service">
+                    <img src="{{ url_for('static', filename='images/bathing.jpg') }}" alt="Мытье" class="open-gallery">
+                    <h3>Мытье</h3>
+                    <p>Цена: 400 руб.</p>
+                    <button class="open-modal" data-service="Мытье">Записаться</button>
+                </div>
+                <div class="service">
+                    <img src="{{ url_for('static', filename='images/ear_cleaning.jpg') }}" alt="Чистка ушей" class="open-gallery">
+                    <h3>Чистка ушей и когтей</h3>
+                    <p>Цена: 300 руб.</p>
+                    <button class="open-modal" data-service="Чистка ушей и когтей">Записаться</button>
+                </div>
+                <div class="service">
+                    <img src="{{ url_for('static', filename='images/hygiene_cut.jpg') }}" alt="Гигиеническая стрижка" class="open-gallery">
+                    <h3>Гигиеническая стрижка</h3>
+                    <p>Цена: 450 руб.</p>
+                    <button class="open-modal" data-service="Гигиеническая стрижка">Записаться</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Модальное окно для формы записи -->
+        <div class="modal" id="bookingModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Запись на груминг</h3>
+                <form id="bookingForm" method="POST" action="/book_grooming">
+                    <select name="serviceType" id="serviceType" required>
+                        <option value="" disabled selected>Выберите услугу</option>
+                        <option value="Стрижка">Стрижка</option>
+                        <option value="Мытье">Мытье</option>
+                        <option value="Чистка ушей и когтей">Чистка ушей и когтей</option>
+                        <option value="Гигиеническая стрижка">Гигиеническая стрижка</option>
+                    </select>
+                    <input type="date" name="date" required>
+                    <input type="time" name="time" required>
+                    <input type="text" name="ownerName" placeholder="Ваше имя" required>
+                    <input type="email" name="email" placeholder="Ваш email" required>
+                    <input type="tel" name="phone" placeholder="Телефон" required>
+                    <textarea name="notes" placeholder="Дополнительные пожелания"></textarea>
+                    <button type="submit">Записаться</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Галерея -->
+        <div class="gallery-modal" id="galleryModal">
+            <div class="gallery-modal-content">
+                <span class="close">&times;</span>
+                <img id="galleryImage" src="" alt="Фото">
+                <div class="gallery-nav">
+                    <span class="prev">&lt;</span>
+                    <span class="next">&gt;</span>
+                </div>
+            </div>
+        </div>
+
+        <section class="image-gallery">
+            <h2>Галерея</h2>
+            <div class="gallery">
+                <img src="{{ url_for('static', filename='images/IMG_4745.JPG') }}" alt="Фото 1" class="open-gallery">
+                <img src="{{ url_for('static', filename='images/IMG_4747.JPG') }}" alt="Фото 2" class="open-gallery">
+                <img src="{{ url_for('static', filename='images/IMG_4749.JPG') }}" alt="Фото 3" class="open-gallery">
+                <img src="{{ url_for('static', filename='images/IMG_4750.JPG') }}" alt="Фото 4" class="open-gallery">
+            </div>
+        </section>
+    </main>
+
+    <div id="footer">{% include 'footer.html' %}</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const galleryImages = document.querySelectorAll('.open-gallery');
+            const galleryModal = document.getElementById('galleryModal');
+            const galleryImage = document.getElementById('galleryImage');
+            const closeGallery = document.querySelector('.gallery-modal .close');
+            const prevButton = document.querySelector('.prev');
+            const nextButton = document.querySelector('.next');
+            let currentImageIndex = 0;
+
+            // Открыть галерею
+            galleryImages.forEach((image, index) => {
+                image.addEventListener('click', () => {
+                    galleryImage.src = image.src;
+                    currentImageIndex = index;
+                    galleryModal.style.display = 'flex';
+                });
+            });
+
+            // Закрыть галерею
+            closeGallery.addEventListener('click', () => {
+                galleryModal.style.display = 'none';
+            });
+
+            // Перелистывание изображений
+            prevButton.addEventListener('click', () => {
+                currentImageIndex = (currentImageIndex === 0) ? galleryImages.length - 1 : currentImageIndex - 1;
+                galleryImage.src = galleryImages[currentImageIndex].src;
+            });
+
+            nextButton.addEventListener('click', () => {
+                currentImageIndex = (currentImageIndex === galleryImages.length - 1) ? 0 : currentImageIndex + 1;
+                galleryImage.src = galleryImages[currentImageIndex].src;
+            });
+
+            // Открытие формы записи
+            const modal = document.getElementById('bookingModal');
+            const openButtons = document.querySelectorAll('.open-modal');
+            const closeModal = document.querySelector('.modal .close');
+            const form = document.getElementById('bookingForm');
+            const serviceType = document.getElementById('serviceType');
+
+            openButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    modal.style.display = 'flex';
+                    serviceType.value = button.getAttribute('data-service');
+                });
+            });
+
+            closeModal.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const confirmation = confirm("Вы уверены, что хотите записаться на эту услугу?");
+                if (!confirmation) return;
+
+                const formData = new FormData(form);
+                const response = await fetch('/book_grooming', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("Вы успешно записаны на груминг!");
+                    window.location.href = '/grooming';
+                } else {
+                    alert("Ошибка при записи. Попробуйте ещё раз.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
